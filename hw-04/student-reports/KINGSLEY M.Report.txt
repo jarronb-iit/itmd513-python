@@ -1,0 +1,13 @@
+Student Name: KINGSLEY M.
+Student ID Number: 2663628
+
+Course Code				Course Credits				Course Grade
+_____________________________________________________
+QA140										3											A
+CM245										3											B
+EQ521										3											A
+MK341										3											A
+CP101										2											B
+
+Total Semester Course Credits Completed: 14
+Semester GPA: 3.64
