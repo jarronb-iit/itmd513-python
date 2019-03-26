@@ -188,6 +188,13 @@ class AppGui:
         self.mainFrame = VerticalScrolledFrame(self.master)
         self.mainFrame.pack(fill=BOTH, expand=True)
 
+        # ***** If dataset is empty*****
+        if len(self.dataSet) == 0:
+            self.datasetEmpty = ttk.Label(
+                self.mainFrame, text="No data loaded from file...\nPlease add an entry.\nNote: Entries in the List can be directly modified", font="Helvetica 16")
+
+            self.datasetEmpty.grid(row=0, column=1)
+
         # ***Creates widgets***
         self.nameLabel = ttk.Label(
             self.mainFrame, text="Names", font="Helvetica 16 bold")
