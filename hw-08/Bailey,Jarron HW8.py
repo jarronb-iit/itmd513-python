@@ -111,7 +111,7 @@ class AppGui:
         self.statusText.set("Actions pending...")
         self.entriesFrameNum = 4
         self.entryErroed = False
-
+        self.master = master
         self.dataSet = self.loadDataSetFromFile()
 
         self.topFrame = Frame(self.master)
