@@ -342,27 +342,30 @@ class AppGui:
         self.statusText.set("Results retrieved...")
         print("Results retrieved...")
 
-    def addNewEntry(self):
+    def addNewEntry(self, event):
         newEntryName = self.newEntryName.get()
         newEntryEmail = self.newEntryEmail.get()
 
         for name, email in self.dataSet.items():
             if name == newEntryName:
+                self.entryErroed = True
                 tkinter.messagebox.showerror(
                     "Invalid Entry", "Name already exist.")
-                self.entryErroed = True
+                print("Error: Name already exist.")
                 return
             elif email == newEntryEmail:
+                self.entryErroed = True
                 tkinter.messagebox.showerror(
                     "Invalid Entry", "Email already exist.")
-                self.entryErroed = True
+                print("Error: Email already exist.")
                 return
 
         isValidEmail = self.validEmail(newEntryEmail)
         if not isValidEmail:
+            self.entryErroed = True
             tkinter.messagebox.showerror(
                 "Invalid Entry", "Please enter a valid email")
-            self.entryErroed = True
+            print("Error: Please enter a valid email.")
         else:
             if self.entryErroed:
                 self.entriesFrameNum + 1
@@ -377,9 +380,7 @@ class AppGui:
             self.newEntryEmail.delete(0, 'end')
             self.master.focus()
             self.entriesFrameNum += 1
-            if self.entryErroed:
-                self.entriesFrameNum += 1
-            self.entryErroed = False
+ 
             self.entriesAdded += 1
             self.statusText.set("Entry added | Total new entries: {} | Total entries: {}".format(
                 self.entriesAdded, len(self.dataSet)))
