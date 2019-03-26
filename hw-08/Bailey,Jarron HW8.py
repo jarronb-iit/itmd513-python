@@ -307,8 +307,8 @@ class AppGui:
             return dataSet
         except FileNotFoundError:
             # TODO: Alert message file not found
-            print("File not found!")
             dataSet = {}
+            print("File not found!")
             return dataSet
 
     def saveDataSetToFile(self):
@@ -338,6 +338,7 @@ class AppGui:
                 self.searchResult.set("Name: " + name)
                 break
             else:
+                print("Error: Entry Not Found...")
                 return tkinter.messagebox.showerror("Entry Not Found", "Entry doesn't exist.")
         self.statusText.set("Results retrieved...")
         print("Results retrieved...")
