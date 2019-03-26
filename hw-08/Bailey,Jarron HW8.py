@@ -285,9 +285,9 @@ class AppGui:
         self.searchEntryLabel = ttk.Label(
             self.searchFrame, text="By Name or Email:", font="Helvetica 10")
         self.searchEntry = ttk.Entry(
-            self.searchFrame, font="Helvetica 12")
+            self.searchFrame, font="Helvetica 12", width=30)
         self.searchResultEntry = ttk.Entry(
-            self.searchFrame, textvariable=self.searchResult, font="Helvetica 12", state="readonly")
+            self.searchFrame, textvariable=self.searchResult, font="Helvetica 12", state="readonly", width=30)
         self.searchEntryBtn = ttk.Button(
             self.searchFrame, text="Search")
         self.searchEntryBtn.bind("<ButtonPress-1>", self.onSearch)
