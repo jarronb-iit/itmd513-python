@@ -345,7 +345,7 @@ class AppGui:
         self.statusText.set("Results retrieved...")
         print("Results retrieved...")
 
-    def addNewEntry(self, event):
+    def addNewEntry(self):
         newEntryName = self.newEntryName.get()
         newEntryEmail = self.newEntryEmail.get()
 
