@@ -1,3 +1,9 @@
+'''
+Jarron Bailey
+Homework 8
+Date: April 1st, 2019
+Description: This program displays a menu that lets the user look up a person’s email address, add a new name and email address, change an existing email address, and delete an existing name and email address. Each time the program starts, it retrieves the dictionary from the file. The program runs continuously until the user selects option exit from the menu.
+'''
 
 try:
     from tkinter import *
@@ -7,7 +13,7 @@ try:
     import json
     from functools import partial
     import re
-except ImportError:
+except ImportError:  # If Import error -> Try again
     from tkinter import *
     from tkinter import ttk
     from ttkthemes import themed_tk as tk
@@ -95,25 +101,41 @@ class VerticalScrolledFrame:
         elif event.num == 5 or event.delta < 0:
             self.canvas.yview_scroll(1, "units")
 
+
 class AppGui:
+    '''
+    This class is responsible for displaying the Application GUI and handling the different states of the widgets
+    '''
+
     def __init__(self, master):
-        self.master = master
-        self.master.winfo_toplevel().title("Name and Email Lookup")
+        '''
+        Init Function is responsible for Initializing variables that will be used to manage state of widgets
+        and run
+        '''
+        # ***Initial variables for Entry list***
         self.currentEntryVal = ""
         self.newEntryVal = ""
-        self.entryType = ""
+        self.entryColumn = ""
         self.entriesAdded = 0
         self.entriesDeleted = 0
         self.entriesUpdated = 0
+
+        # ***Initial variables for search results***
         self.searchResult = StringVar()
         self.searchResult.set("Result Pending...")
+
+        # ***Initial variables for status bar***
         self.statusText = StringVar()
         self.statusText.set("Actions pending...")
+
+        # ***Initial variables for Frame***
         self.entriesFrameNum = 4
         self.entryErroed = False
         self.master = master
+
         self.dataSet = self.loadDataSetFromFile()
 
+        # ***Initializing Frames postion in root***
         self.topFrame = Frame(self.master)
         self.topFrame.pack(side=TOP, fill=X, anchor=NW)
 
@@ -128,13 +150,15 @@ class AppGui:
         status.pack(side=BOTTOM, fill=X)
 
         self.createTopFrame()
-        # self.onAddEntrySection()
-        # self.onAddSearchSection()
         self.createMainFrame()
         self.setFrameGridConfigs()
 
     def createTopFrame(self):
-        # ***** Top Frame *****
+        '''
+        Function builds the top frame of the which consits of four buttons that are
+        save file, add entry, search entry, and exit
+        '''
+        # ***Creates widgets***
         self.saveFileBtn = ttk.Button(
             self.topFrame, text="Save File", command=self.saveDataSetToFile)
         self.addSectionBtn = ttk.Button(
@@ -144,6 +168,7 @@ class AppGui:
         self.exitBtn = ttk.Button(
             self.topFrame, text="Exit", command=self.onExit)
 
+        # ***Widgets Layout***
         self.saveFileBtn.grid(row=0, column=1, sticky=(
             S, E, W, N), pady=15, padx=7.5)
         self.addSectionBtn.grid(row=0, column=2, sticky=(
@@ -154,10 +179,16 @@ class AppGui:
             S, E, W, N), pady=15, padx=7.5)
 
     def createMainFrame(self):
-        # ***** Main Frame *****
-        self.mainFrame = VerticalScrolledFrame(self.master)
-        self.mainFrame.pack(fill=BOTH, expand=True)  # fill window
+        '''
+        Function build out the main frame of the application which consits of
+        a list of entries that filled with names and email address that can be edited or deleted
+         '''
 
+        # ***** Add Main Frame to Master Frame*****
+        self.mainFrame = VerticalScrolledFrame(self.master)
+        self.mainFrame.pack(fill=BOTH, expand=True)
+
+        # ***Creates widgets***
         self.nameLabel = ttk.Label(
             self.mainFrame, text="Names", font="Helvetica 16 bold")
         self.emailLabel = ttk.Label(
@@ -170,21 +201,26 @@ class AppGui:
             self.entryName = name + "Name"
             self.entryEmail = name + "Email"
 
+            # Names Entries
             self.entryName = ttk.Entry(
                 self.mainFrame, font="Helvetica 12")
             self.entryName.insert(0, self.name)
             self.entryName.bind('<Return>', self.onEntryInteraction)
             self.entryName.bind('<Button-1>', self.onEntryInteraction)
 
+            # Email Entries
             self.entryEmail = ttk.Entry(self.mainFrame, font="Helvetica 12")
             self.entryEmail.insert(0, self.email)
             self.entryEmail.bind('<Return>', self.onEntryInteraction)
             self.entryEmail.bind('<Button-1>', self.onEntryInteraction)
 
+            # Delete Buttons
             self.entryButton = ttk.Button(
                 self.mainFrame, text="Delete")
             self.entryButton.bind(
                 "<ButtonPress-1>", partial(self.deleteEntry, name=self.name, email=self.email))
+
+            # ***Widgets Layout***
             self.nameLabel.grid(row=0, column=1)
             self.entryName.grid(row=ctr, column=1, sticky=(
                 N, S, E, W), pady=2, padx=(15, 7.5))
@@ -196,8 +232,87 @@ class AppGui:
 
             self.ctr = ctr
 
+    def onAddEntrySection(self):
+        '''
+        Function is responsible for building out the add entry section during
+        the "Add Entry" button click
+        '''
+
+        # ***Creates widgets***
+        self.addSectionLabel = ttk.Label(
+            self.addFrame, text="Add Entry", font="Helvetica 12 bold")
+        self.nameLabel = ttk.Label(
+            self.addFrame, text="Name:", font="Helvetica 10")
+        self.emailLabel = ttk.Label(
+            self.addFrame, text="Email:", font="Helvetica 10")
+        self.newEntryName = ttk.Entry(
+            self.addFrame, font="Helvetica 12")
+        self.newEntryEmail = ttk.Entry(
+            self.addFrame, font="Helvetica 12")
+        self.addNewEntryBtn = ttk.Button(
+            self.addFrame, text="Done", command=self.addNewEntry)
+
+        # ***Widgets Layout***
+        self.addSectionLabel.grid(row=0, column=1, sticky=(
+            N, E, W))
+        self.nameLabel.grid(row=1, column=1, sticky=(
+            N, E, W))
+        self.newEntryName.grid(row=2, column=1, sticky=(
+            N, E, W), pady=2, padx=(15, 7.5))
+        self.emailLabel.grid(row=1, column=2, sticky=(
+            N, E, W))
+        self.newEntryEmail.grid(row=2, column=2, sticky=(
+            N, E, W), pady=2, padx=(15, 7.5))
+        self.addNewEntryBtn.grid(row=2, column=3, sticky=(
+            N, E, W), pady=15, padx=7.5)
+
+        self.addSectionBtn.config(state=DISABLED)
+        self.master.focus()
+        self.statusText.set("Adding entry...")
+
+    def onAddSearchSection(self):
+        '''
+        Function is responsible for building out the add entry section during
+        the "Add Entry" button click
+        '''
+
+        # ***Creates widgets***
+        self.addSearchSectionLabel = ttk.Label(
+            self.searchFrame, text="Search for Entry", font="Helvetica 12 bold")
+        self.searchEntryLabel = ttk.Label(
+            self.searchFrame, text="By Name or Email:", font="Helvetica 10")
+        self.searchEntry = ttk.Entry(
+            self.searchFrame, font="Helvetica 12")
+        self.searchResultEntry = ttk.Entry(
+            self.searchFrame, textvariable=self.searchResult, font="Helvetica 12", state="readonly")
+        self.searchEntryBtn = ttk.Button(
+            self.searchFrame, text="Search")
+        self.searchEntryBtn.bind("<ButtonPress-1>", self.onSearch)
+        self.searchEntry.bind("<Return>", self.onSearch)
+
+        # ***Widgets Layout***
+        self.addSearchSectionLabel.grid(row=0, column=1, sticky=(
+            N, E, W))
+        self.searchEntryLabel.grid(row=1, column=1, sticky=(
+            N, E, W))
+        self.searchEntry.grid(row=2, column=1, sticky=(
+            N, E, W), pady=2, padx=(15, 7.5))
+        self.searchResultEntry.grid(row=2, column=3, sticky=(
+            N, E, W))
+        self.searchEntryBtn.grid(row=2, column=4, sticky=(
+            N, E, W), pady=15, padx=7.5)
+
+        self.searchSectionBtn.config(state=DISABLED)
+        self.master.focus()
+        self.statusText.set("Searching entry...")
+
     def setFrameGridConfigs(self):
-        # ***** Configs *****
+        '''
+        Function is responsible for adding grid configurations for 3/4 of the frames
+        which is the top frame, add section frame, search entry frame. First group of 
+        configs for each frame prospectively is for the content, and the second is the 
+        spacing around the content.
+        '''
         self.topFrame.columnconfigure(1, weight=1)
         self.topFrame.columnconfigure(2, weight=1)
         self.topFrame.columnconfigure(3, weight=1)
@@ -221,117 +336,132 @@ class AppGui:
         self.searchFrame.columnconfigure(2, weight=0)
         self.searchFrame.columnconfigure(5, weight=4)
 
-    def validEmail(self, email):
-        EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
-        if not EMAIL_REGEX.match(email):
-            return False
+    def onEntryInteraction(self, event):
+        '''
+        Function allows entries in the main frame to be modified and updates dataset of modification
+        '''
+
+        # Initializing variables
+        isNameInDataset = False
+        nameInDataset = None
+        isEmailInDataset = False
+        emailInDataset = None
+
+        self.master.focus()
+
+        # Mouse click
+        if event.num == 1:
+            self.currentEntryVal = event.widget.get()
+
+        # Enter Key
+        if event.keycode == 13:
+            self.newEntryVal = event.widget.get()
+            self.entryColumn = event.widget.grid_info()['column']
+
+            if self.entryColumn == 1:
+                self.entryColumn = "name"
+            elif self.entryColumn == 2:
+                self.entryColumn = "email"
+
+            # Get original name and email of modified data entry
+            for name, email in self.dataSet.items():
+                if name == self.currentEntryVal or self.currentEntryVal == email:
+                    nameInDataset = name
+                    emailInDataset = email
+                    break
+
+            answer = tkinter.messagebox.askyesno(
+                "Overwriting Entry", "Are you sure you want to overwrite existing entry of {}.".format(self.currentEntryVal))
+
+            if answer == False:
+                self.entryErroed = True
+                event.widget.delete(0, END)
+                event.widget.insert(0, self.currentEntryVal)
+                self.currentEntryVal = None
+                self.newEntryVal = None
+                return
+            else:
+                if self.entryColumn == "name":
+                    emailInDataset = self.dataSet[self.currentEntryVal]
+                    del self.dataSet[self.currentEntryVal]
+                    self.dataSet[self.newEntryVal] = emailInDataset
+
+                elif self.entryColumn == 'email':
+                    isValidEmail = self.validEmail(self.newEntryVal)
+                    if not isValidEmail:
+                        self.entryErroed = True
+                        tkinter.messagebox.showerror(
+                            "Invalid Entry", "Please enter a valid email")
+                        print("Error: Please enter a valid email")
+                        return
+                    else:
+                        self.dataSet[nameInDataset] = self.newEntryVal
+
+                print(self.dataSet)
+                self.entriesUpdated += 1
+
+            self.statusText.set("Entry updated | Total entries updated: {} | Total entries: {}".format(
+                self.entriesUpdated, len(self.dataSet)))
+            return print("Entry updated | Total entries updated: {} | Total entries: {}".format(self.entriesUpdated, len(self.dataSet)))
+
+    def addNewEntry(self):
+        '''
+        Function adds a new entry of an name and email to the main frame which is the listing
+        of the dataset
+        '''
+        newEntryName = self.newEntryName.get()
+        newEntryEmail = self.newEntryEmail.get()
+
+        # Check to see if name or email exist in dataset already
+        for name, email in self.dataSet.items():
+            if name == newEntryName:
+                self.entryErroed = True
+                tkinter.messagebox.showerror(
+                    "Invalid Entry", "Name already exist.")
+                print("Error: Name already exist.")
+                return
+            elif email == newEntryEmail:
+                self.entryErroed = True
+                tkinter.messagebox.showerror(
+                    "Invalid Entry", "Email already exist.")
+                print("Error: Email already exist.")
+                return
+
+        # If name and email is unique check the validity of email
+        isValidEmail = self.validEmail(newEntryEmail)
+        if not isValidEmail:
+            self.entryErroed = True
+            tkinter.messagebox.showerror(
+                "Invalid Entry", "Please enter a valid email")
+            print("Error: Please enter a valid email.")
         else:
-            return True
+            # If erroed increase number of the main entry frame is increased by one
+            if self.entryErroed:
+                self.entriesFrameNum + 1
 
-    def removeFrame(self, frame):
-        frame.pack_forget()
-        frame.destroy()
+            # Set Entry & update frame
+            self.dataSet[newEntryName] = newEntryEmail
+            self.removeFrame(
+                self.master.children["!frame{}".format(self.entriesFrameNum)])
 
-    def forgetFrame(self, frame):
-        frame.pack_forget()
+            # Reset styles
+            self.master.after(0, self.createMainFrame)
+            self.newEntryName.delete(0, 'end')
+            self.newEntryEmail.delete(0, 'end')
+            self.master.focus()
+            self.entriesFrameNum += 1
 
-    def onAddEntrySection(self):
-        # Show Add Section
-        self.addSectionLabel = ttk.Label(
-            self.addFrame, text="Add Entry", font="Helvetica 12 bold")
-        self.nameLabel = ttk.Label(
-            self.addFrame, text="Name:", font="Helvetica 10")
-        self.emailLabel = ttk.Label(
-            self.addFrame, text="Email:", font="Helvetica 10")
-        self.newEntryName = ttk.Entry(
-            self.addFrame, font="Helvetica 12")
-        self.newEntryEmail = ttk.Entry(
-            self.addFrame, font="Helvetica 12")
-        self.addNewEntryBtn = ttk.Button(
-            self.addFrame, text="Done", command=self.addNewEntry)
-
-        self.addSectionLabel.grid(row=0, column=1, sticky=(
-            N, E, W))
-        self.nameLabel.grid(row=1, column=1, sticky=(
-            N, E, W))
-        self.newEntryName.grid(row=2, column=1, sticky=(
-            N, E, W), pady=2, padx=(15, 7.5))
-        self.emailLabel.grid(row=1, column=2, sticky=(
-            N, E, W))
-        self.newEntryEmail.grid(row=2, column=2, sticky=(
-            N, E, W), pady=2, padx=(15, 7.5))
-        self.addNewEntryBtn.grid(row=2, column=3, sticky=(
-            N, E, W), pady=15, padx=7.5)
-
-        self.addSectionBtn.config(state=DISABLED)
-        self.master.focus()
-
-        self.statusText.set("Adding entry...")
-
-    def onAddSearchSection(self):
-        # Show Search Section
-
-        self.addSearchSectionLabel = ttk.Label(
-            self.searchFrame, text="Search for Entry", font="Helvetica 12 bold")
-        self.searchEntryLabel = ttk.Label(
-            self.searchFrame, text="By Name or Email:", font="Helvetica 10")
-        self.searchEntry = ttk.Entry(
-            self.searchFrame, font="Helvetica 12")
-        self.searchResultEntry = ttk.Entry(
-            self.searchFrame, textvariable=self.searchResult, font="Helvetica 12", state="readonly")
-        self.searchEntryBtn = ttk.Button(
-            self.searchFrame, text="Search")
-        self.searchEntryBtn.bind("<ButtonPress-1>", self.onSearch)
-        self.searchEntry.bind("<Return>", self.onSearch)
-
-        self.addSearchSectionLabel.grid(row=0, column=1, sticky=(
-            N, E, W))
-        self.searchEntryLabel.grid(row=1, column=1, sticky=(
-            N, E, W))
-        self.searchEntry.grid(row=2, column=1, sticky=(
-            N, E, W), pady=2, padx=(15, 7.5))
-        self.searchResultEntry.grid(row=2, column=3, sticky=(
-            N, E, W))
-        self.searchEntryBtn.grid(row=2, column=4, sticky=(
-            N, E, W), pady=15, padx=7.5)
-
-        self.searchSectionBtn.config(state=DISABLED)
-        self.master.focus()
-
-        self.statusText.set("Searching entry...")
-
-    def loadDataSetFromFile(self):
-        try:
-            with open('dataSet.json', 'r') as inputFile:
-                dataSet = json.load(inputFile)
-                inputFile.close()
-            
-            self.statusText.set("File loaded | Total entries: {}".format(len(dataSet)))
-            print(("File loaded | Total entries: {}".format(len(dataSet))))
-            return dataSet
-        except FileNotFoundError:
-            # TODO: Alert message file not found
-            dataSet = {}
-            print("File not found!")
-            return dataSet
-
-    def saveDataSetToFile(self):
-        with open('dataSet.json', 'w') as outfile:
-            json.dump(self.dataSet, outfile, sort_keys=True,
-                      indent=2, separators=(',', ': '))
-            outfile.close()
-
-        self.master.focus()
-
-        self.statusText.set("File saved | Total new entries: {} | Total deleted: {} | Total entries updated: {} | Total entries: {}".format(
-                self.entriesAdded,self.entriesDeleted,self.entriesUpdated, len(self.dataSet)))
-        return print("File saved | Total new entries: {} | Total deleted: {} | Total entries updated: {} | Total entries: {}".format(
-                self.entriesAdded,self.entriesDeleted,self.entriesUpdated, len(self.dataSet)))
-
-    def onExit(self):
-        self.master.destroy()
+            self.entriesAdded += 1
+            self.statusText.set("Entry added | Total new entries: {} | Total entries: {}".format(
+                self.entriesAdded, len(self.dataSet)))
+            return print("Entry added | Total new entries: {} | Total entries: {}".format(
+                self.entriesAdded, len(self.dataSet)))
 
     def onSearch(self, event):
+        '''
+        Function search through dataset and returns either a matching email or name depending on information queried
+        '''
+        # Variables initialization
         isNameInDataset = False
         isEmailInDataset = False
         nameInDataset = ""
@@ -353,57 +483,12 @@ class AppGui:
             self.searchResult.set("Email: " + emailInDataset)
         elif isEmailInDataset:
             self.searchResult.set("Name: " + nameInDataset)
-            else:
-                print("Error: Entry Not Found...")
-                return tkinter.messagebox.showerror("Entry Not Found", "Entry doesn't exist.")
+        else:
+            print("Error: Entry Not Found...")
+            return tkinter.messagebox.showerror("Entry Not Found", "Entry doesn't exist.")
 
         self.statusText.set("Results retrieved...")
         print("Results retrieved...")
-
-    def addNewEntry(self):
-        newEntryName = self.newEntryName.get()
-        newEntryEmail = self.newEntryEmail.get()
-
-        for name, email in self.dataSet.items():
-            if name == newEntryName:
-                self.entryErroed = True
-                tkinter.messagebox.showerror(
-                    "Invalid Entry", "Name already exist.")
-                print("Error: Name already exist.")
-                return
-            elif email == newEntryEmail:
-                self.entryErroed = True
-                tkinter.messagebox.showerror(
-                    "Invalid Entry", "Email already exist.")
-                print("Error: Email already exist.")
-                return
-
-        isValidEmail = self.validEmail(newEntryEmail)
-        if not isValidEmail:
-            self.entryErroed = True
-            tkinter.messagebox.showerror(
-                "Invalid Entry", "Please enter a valid email")
-            print("Error: Please enter a valid email.")
-        else:
-            if self.entryErroed:
-                self.entriesFrameNum + 1
-            self.dataSet[newEntryName] = newEntryEmail
-
-            self.removeFrame(
-                self.master.children["!frame{}".format(self.entriesFrameNum)])
-
-            self.master.after(0, self.createMainFrame)
-
-            self.newEntryName.delete(0, 'end')
-            self.newEntryEmail.delete(0, 'end')
-            self.master.focus()
-            self.entriesFrameNum += 1
- 
-            self.entriesAdded += 1
-            self.statusText.set("Entry added | Total new entries: {} | Total entries: {}".format(
-                self.entriesAdded, len(self.dataSet)))
-            return print("Entry added | Total new entries: {} | Total entries: {}".format(
-                self.entriesAdded, len(self.dataSet)))
 
     def deleteEntry(self, event, name, email):
         parentFame = event.widget.master.winfo_name()
@@ -411,7 +496,7 @@ class AppGui:
 
         row = event.widget.grid_info()['row']      # Row of the button
         # grid_info will return dictionary with all grid elements (row, column, ipadx, ipday, sticky, rowspan and columnspan)
-        
+
         for label in self.master.children[parentFame].children["!canvas"].children["!frame"].grid_slaves():
             if int(label.grid_info()["row"]) == row:
                 label.grid_remove()
@@ -422,69 +507,65 @@ class AppGui:
             self.entriesDeleted, len(self.dataSet)))
         return print("Entry deleted | Total entries deleted: {} | Total entries: {}".format(self.entriesDeleted, len(self.dataSet)))
 
-    def onEntryInteraction(self, event):
-        isNameInDataset = False
-        nameInDataset = None
-        isEmailInDataset = False
-        emailInDataset = None
+    def loadDataSetFromFile(self):
+        '''
+        Function returns a dataset from "dataset.json" file if file dont exist
+        the dataset is initialized to an empty dictionary
+        '''
+        try:
+            with open('dataSet.json', 'r') as inputFile:
+                dataSet = json.load(inputFile)
+                inputFile.close()
+
+            self.statusText.set(
+                "File loaded | Total entries: {}".format(len(dataSet)))
+            print(("File loaded | Total entries: {}".format(len(dataSet))))
+            return dataSet
+        except FileNotFoundError:
+            # TODO: Alert message file not found
+            dataSet = {}
+            print("File not found!")
+            return dataSet
+
+    def saveDataSetToFile(self):
+        '''
+        Function saves current dataset to "dataset.json and sorts data on save
+        '''
+        with open('dataSet.json', 'w') as outfile:
+            json.dump(self.dataSet, outfile, sort_keys=True,
+                      indent=2, separators=(',', ': '))
+            outfile.close()
 
         self.master.focus()
 
-        if event.num == 1:
-            self.currentEntryVal = event.widget.get()
+        self.statusText.set("File saved | Total new entries: {} | Total deleted: {} | Total entries updated: {} | Total entries: {}".format(
+            self.entriesAdded, self.entriesDeleted, self.entriesUpdated, len(self.dataSet)))
+        return print("File saved | Total new entries: {} | Total deleted: {} | Total entries updated: {} | Total entries: {}".format(
+            self.entriesAdded, self.entriesDeleted, self.entriesUpdated, len(self.dataSet)))
 
-        if event.keycode == 13:
-            self.newEntryVal = event.widget.get()
-            self.entryType = event.widget.grid_info()['column']
+    def validEmail(self, email):
+        '''
+        Function returns if an email is valid or not by checking email against an
+        regular expression
+        '''
+        EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
+        if not EMAIL_REGEX.match(email):
+            return False
+        else:
+            return True
 
-            if self.entryType == 1:
-                self.entryType = "name"
-            elif self.entryType == 2:
-                self.entryType = "email"
+    def removeFrame(self, frame):
+        '''Function removes the frame passed in from the GUI'''
+        frame.pack_forget()
+        frame.destroy()
 
-            for name, email in self.dataSet.items():
-                # print(event.num, event.keycode, name, email, self.currentEntryVal, self.newEntryVal)
-                
-                if name == self.currentEntryVal or self.currentEntryVal == email:
-                    nameInDataset = name
-                    emailInDataset = email
-                    break
-
-            print(nameInDataset, emailInDataset)
-                    answer = tkinter.messagebox.askyesno(
-                    "Overwriting Entry", "Are you sure you want to overwrite existing entry of {}.".format(self.currentEntryVal))
- 
-            if answer == False:
-                        self.entryErroed = True
-                event.widget.delete(0, END)
-                event.widget.insert(0, self.currentEntryVal)
-                self.currentEntryVal = None
-                self.newEntryVal = None
-                        return
-            else:
-                if self.entryType == "name":
-                    #print(nameInDataset, emailInDataset)
-                    emailInDataset = self.dataSet[self.currentEntryVal]
-                    del self.dataSet[self.currentEntryVal]
-                    self.dataSet[self.newEntryVal] = emailInDataset 
-                    
-                elif self.entryType == 'email':
-                    isValidEmail = self.validEmail(self.newEntryVal)
-                    if not isValidEmail:
-                        self.entryErroed = True
-                        tkinter.messagebox.showerror("Invalid Entry", "Please enter a valid email")
-                        print("Error: Please enter a valid email")
-                        return
-                    else:
-                        self.dataSet[nameInDataset] = self.newEntryVal
-                print(self.dataSet)
-                self.entriesUpdated += 1
-
-            self.statusText.set("Entry updated | Total entries updated: {} | Total entries: {}".format(
-                self.entriesUpdated, len(self.dataSet)))
-            return print("Entry updated | Total entries updated: {} | Total entries: {}".format(self.entriesUpdated, len(self.dataSet)))
+    def onExit(self):
+        '''Function quits program by destroying root frame during click of the "Exit" button '''
+        self.master.destroy()
+        return print("Program exited...")
 
 
+# Run Main program with themes, if fail -> no thememing
 if __name__ == "__main__":
     try:
         root = tk.ThemedTk()
