@@ -250,7 +250,10 @@ class AppGui:
         self.newEntryEmail = ttk.Entry(
             self.addFrame, font="Helvetica 12")
         self.addNewEntryBtn = ttk.Button(
-            self.addFrame, text="Done", command=self.addNewEntry)
+            self.addFrame, text="Done")
+
+        self.addNewEntryBtn.bind('<Button-1>', self.addNewEntry)
+        self.newEntryEmail.bind('<Return>', self.addNewEntry)
 
         # ***Widgets Layout***
         self.addSectionLabel.grid(row=0, column=1, sticky=(
@@ -404,7 +407,7 @@ class AppGui:
                 self.entriesUpdated, len(self.dataSet)))
             return print("Entry updated | Total entries updated: {} | Total entries: {}".format(self.entriesUpdated, len(self.dataSet)))
 
-    def addNewEntry(self):
+    def addNewEntry(self, event):
         '''
         Function adds a new entry of an name and email to the main frame which is the listing
         of the dataset
@@ -441,8 +444,7 @@ class AppGui:
 
             # Set Entry & update frame
             self.dataSet[newEntryName] = newEntryEmail
-            self.removeFrame(
-                self.master.children["!frame{}".format(self.entriesFrameNum)])
+            self.removeFrame(self.mainFrame)
 
             # Reset styles
             self.master.after(0, self.createMainFrame)
