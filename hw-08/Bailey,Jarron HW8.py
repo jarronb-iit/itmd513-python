@@ -28,6 +28,8 @@ except ImportError:
 
 class VerticalScrolledFrame:
     """
+    Author: Github ID = @novel-yet-trivial
+    Link: https://gist.github.com/novel-yet-trivial/3eddfce704db3082e38c84664fc1fdf8
     A vertically scrolled Frame that can be treated like any other Frame
     ie it needs a master and layout and it can be a master.
     keyword arguments are passed to the underlying Frame
