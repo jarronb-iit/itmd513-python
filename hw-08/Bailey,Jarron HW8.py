@@ -387,11 +387,13 @@ class AppGui:
                 self.entriesAdded, len(self.dataSet)))
 
     def deleteEntry(self, event, name, email):
+        parentFame = event.widget.master.winfo_name()
+        self.entriesFrameNum = int(list(filter(str.isdigit, parentFame))[0])
 
         row = event.widget.grid_info()['row']      # Row of the button
         # grid_info will return dictionary with all grid elements (row, column, ipadx, ipday, sticky, rowspan and columnspan)
-        column = event.widget.grid_info()['column']
-        for label in self.master.children["!frame{}".format(self.entriesFrameNum)].children["!canvas"].children["!frame"].grid_slaves():
+        
+        for label in self.master.children[parentFame].children["!canvas"].children["!frame"].grid_slaves():
             if int(label.grid_info()["row"]) == row:
                 label.grid_remove()
         self.dataSet.pop(name)
