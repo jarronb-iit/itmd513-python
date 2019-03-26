@@ -404,6 +404,10 @@ class AppGui:
         return print("Entry deleted | Total entries deleted: {} | Total entries: {}".format(self.entriesDeleted, len(self.dataSet)))
 
     def onEntryInteraction(self, event):
+        isNameInDataset = False
+        nameInDataset = None
+        isEmailInDataset = False
+        emailInDataset = None
 
         self.master.focus()
 
@@ -412,29 +416,50 @@ class AppGui:
 
         if event.keycode == 13:
             self.newEntryVal = event.widget.get()
+            self.entryType = event.widget.grid_info()['column']
+
+            if self.entryType == 1:
+                self.entryType = "name"
+            elif self.entryType == 2:
+                self.entryType = "email"
 
             for name, email in self.dataSet.items():
-                if name == self.currentEntryVal:
-                    self.entryErroed = True
-                    return tkinter.messagebox.showerror("Invalid Entry", "Name already exist.")
+                # print(event.num, event.keycode, name, email, self.currentEntryVal, self.newEntryVal)
+                
+                if name == self.currentEntryVal or self.currentEntryVal == email:
+                    nameInDataset = name
+                    emailInDataset = email
+                    break
 
-                elif email == self.currentEntryVal:
+            print(nameInDataset, emailInDataset)
                     answer = tkinter.messagebox.askyesno(
-                        "Overwriting Entry", "Are you sure you want to overwrite existing entry of {}.".format(name))
-                    if answer == "no":
+                    "Overwriting Entry", "Are you sure you want to overwrite existing entry of {}.".format(self.currentEntryVal))
+ 
+            if answer == False:
                         self.entryErroed = True
+                event.widget.delete(0, END)
+                event.widget.insert(0, self.currentEntryVal)
+                self.currentEntryVal = None
+                self.newEntryVal = None
                         return
-                    isValidEmail = self.validEmail(self.currentEntryVal)
+            else:
+                if self.entryType == "name":
+                    #print(nameInDataset, emailInDataset)
+                    emailInDataset = self.dataSet[self.currentEntryVal]
+                    del self.dataSet[self.currentEntryVal]
+                    self.dataSet[self.newEntryVal] = emailInDataset 
+                    
+                elif self.entryType == 'email':
+                    isValidEmail = self.validEmail(self.newEntryVal)
                     if not isValidEmail:
                         self.entryErroed = True
-                        return tkinter.messagebox.showerror("Invalid Entry", "Please enter a valid email")
-
-                    self.dataSet[name] = self.newEntryVal
-                    break
-                if self.entryErroed:
-                    self.entriesFrameNum += 1
-                self.entryErroed = False
-                self.entriesUpdated = + 1
+                        tkinter.messagebox.showerror("Invalid Entry", "Please enter a valid email")
+                        print("Error: Please enter a valid email")
+                        return
+                    else:
+                        self.dataSet[nameInDataset] = self.newEntryVal
+                print(self.dataSet)
+                self.entriesUpdated += 1
 
             self.statusText.set("Entry updated | Total entries updated: {} | Total entries: {}".format(
                 self.entriesUpdated, len(self.dataSet)))
