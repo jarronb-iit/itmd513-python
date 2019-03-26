@@ -280,7 +280,9 @@ class AppGui:
         self.searchResultEntry = ttk.Entry(
             self.searchFrame, textvariable=self.searchResult, font="Helvetica 12", state="readonly")
         self.searchEntryBtn = ttk.Button(
-            self.searchFrame, text="Search", command=self.onSearch)
+            self.searchFrame, text="Search")
+        self.searchEntryBtn.bind("<ButtonPress-1>", self.onSearch)
+        self.searchEntry.bind("<Return>", self.onSearch)
 
         self.addSearchSectionLabel.grid(row=0, column=1, sticky=(
             N, E, W))
@@ -329,19 +331,32 @@ class AppGui:
     def onExit(self):
         self.master.destroy()
 
-    def onSearch(self):
+    def onSearch(self, event):
+        isNameInDataset = False
+        isEmailInDataset = False
+        nameInDataset = ""
+        emailInDataset = ""
+
         searchEntryText = self.searchEntry.get()
 
         for name, email in self.dataSet.items():
+
             if name == searchEntryText:
-                self.searchResult.set("Email: " + email)
+                isNameInDataset = True
+                emailInDataset = email
+            elif searchEntryText == email:
+                isEmailInDataset = True
+                nameInDataset = name
                 break
-            elif email == self.currentEntryVal:
-                self.searchResult.set("Name: " + name)
-                break
+
+        if isNameInDataset:
+            self.searchResult.set("Email: " + emailInDataset)
+        elif isEmailInDataset:
+            self.searchResult.set("Name: " + nameInDataset)
             else:
                 print("Error: Entry Not Found...")
                 return tkinter.messagebox.showerror("Entry Not Found", "Entry doesn't exist.")
+
         self.statusText.set("Results retrieved...")
         print("Results retrieved...")
 
