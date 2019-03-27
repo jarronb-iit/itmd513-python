@@ -387,8 +387,6 @@ class AppGui:
                 self.entryErroed = True
                 event.widget.delete(0, END)
                 event.widget.insert(0, self.currentEntryVal)
-                self.currentEntryVal = None
-                self.newEntryVal = None
                 return
             else:
                 if self.entryColumn == "name":
@@ -400,9 +398,9 @@ class AppGui:
                     isValidEmail = self.validEmail(self.newEntryVal)
                     if not isValidEmail:
                         self.entryErroed = True
+                        print("Error: Please enter a valid email")
                         tkinter.messagebox.showerror(
                             "Invalid Entry", "Please enter a valid email")
-                        print("Error: Please enter a valid email")
                         return
                     else:
                         self.dataSet[nameInDataset] = self.newEntryVal
@@ -432,9 +430,9 @@ class AppGui:
                 return
             elif email == newEntryEmail:
                 self.entryErroed = True
+                print("Error: Email already exist.")
                 tkinter.messagebox.showerror(
                     "Invalid Entry", "Email already exist.")
-                print("Error: Email already exist.")
                 return
 
         # If name and email is unique check the validity of email
