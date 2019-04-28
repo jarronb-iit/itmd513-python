@@ -38,6 +38,7 @@ class MainView(ttk.Frame):
         for navigating between each page
         '''
         ttk.Frame.__init__(self, *args, **kwargs)
+        self.winfo_toplevel().title("Bailey, Jarron - Spring 2019 Final")
         self.p1 = HomePage(self)
         self.p2 = SurgeriesPage(self)
         self.p3 = MedicationsPage(self)

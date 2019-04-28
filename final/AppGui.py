@@ -156,7 +156,7 @@ class HomePage(Page):
     def __init__(self, *args, **kwargs):
         '''Constructor builds and displays the HomePage widgets'''
         Page.__init__(self, *args, **kwargs)
-
+    
         self.__nameResult = StringVar()
         self.__nameResult.set("Name Pending...")
 
@@ -171,13 +171,13 @@ class HomePage(Page):
 
         # Header/App title
         self.__headerLabel = ttk.Label(
-            self.__frame, text="Welcome to IIT Patient Management ", font="Helvetica 22 bold", anchor="center")
+            self.__frame, text="Welcome to IIT Patient Management System", font="Helvetica 22 bold", anchor="center")
         self.__letsStartWith = ttk.Label(
-            self.__frame, text="Lets start with entering the patients details ", font="Helvetica 16", anchor="center")
+            self.__frame, text="Lets start with entering the patients details(Press enter to submit detail) ", font="Helvetica 16", anchor="center")
 
         # Name widgets
         self.__patientsNameLabel = ttk.Label(
-            self.__frame, text="Pateint's name:", font="Helvetica 10")
+            self.__frame, text="Pateint's name:", font="Helvetica 12")
         self.__patientsNameEntry = ttk.Entry(
             self.__frame, font="Helvetica 12", width=30)
         self.__patientsNameResultLabel = ttk.Label(
@@ -190,20 +190,20 @@ class HomePage(Page):
 
         # Date of Birth widgets
         self.__dateOfBirthLabel = ttk.Label(
-            self.__frame, text="Date of Birth:", font="Helvetica 10")
+            self.__frame, text="Date of Birth:", font="Helvetica 12")
         self.__dateOfBirthLabelEntry = ttk.Entry(
             self.__frame, font="Helvetica 12", width=30)
         self.__dateOfBirthResultLabel = ttk.Label(
             self.__frame, textvariable=self.__dateOfBirthResult, font="Helvetica 12", state="readonly", width=30, relief=RAISED)
 
         # Bindings
-        self.__dateOfBirthLabelEntry.insert(0, 'Patient date of birth...')
+        self.__dateOfBirthLabelEntry.insert(0, 'Ex: mm-dd-yyyy')
         self.__dateOfBirthLabelEntry.bind("<FocusIn>", lambda args: self.__dateOfBirthLabelEntry.delete('0', 'end'))
         self.__dateOfBirthLabelEntry.bind('<Return>', self.__onDateOfBirthEntry)
      
         # Days spent in hospital widgets
         self.__daysSpentLabel = ttk.Label(
-            self.__frame, text="Days in Hospital:", font="Helvetica 10")
+            self.__frame, text="Days in Hospital:", font="Helvetica 12")
         self.__daysSpentEntry = ttk.Entry(
             self.__frame, font="Helvetica 12", width=30)
         self.__daysSpentResultLabel = ttk.Label(
@@ -251,7 +251,7 @@ class HomePage(Page):
 
         self.__frame.columnconfigure(0, weight=4)
         self.__frame.columnconfigure(3, weight=4)
-
+    
     def __onNameEntry(self, event):
         '''Function is responsible getting the name from the entry, validating, and passing the name to the patients account'''
         name = event.widget.get()
