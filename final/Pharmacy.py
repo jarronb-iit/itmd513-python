@@ -1,6 +1,6 @@
 '''
 Jarron Bailey
-Homework 11
+Final Assignments
 Date: May 6th, 2019
 Description: This program is to present a GUI that computes a patient’s bill for a hospital stay.
 A GUI that allows the user to enter a type of surgery and a type of medication, and check the patient
